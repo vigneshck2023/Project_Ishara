@@ -114,21 +114,32 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
+// Get products by category name
 app.get("/api/categories/:categoryName", async (req, res) => {
   try {
     const categoryName = req.params.categoryName;
+
+    // Find products in this category
     const products = await Product.find({ category: categoryName });
 
     if (!products.length) {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    res.status(200).json({ data: { category: { name: categoryName, products } } });
+    res.status(200).json({
+      data: {
+        category: {
+          name: categoryName,
+          products
+        }
+      }
+    });
   } catch (error) {
     console.error("Error fetching category:", error);
     res.status(500).json({ message: "Failed to fetch category", error });
   }
 });
+
 
 // Start Server
 module.exports = app;
