@@ -10,12 +10,8 @@ const { Product, Wishlist } = require("./models/ecommerce.models");
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",       // local frontend
-      "https://project-ishara.vercel.app" // deployed frontend
-    ],
-    credentials: true,
-    optionsSuccessStatus: 200
+    origin: "*",
+    optionsSuccessStatus: 200,
   })
 );
 
