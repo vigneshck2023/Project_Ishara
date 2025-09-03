@@ -103,10 +103,9 @@ app.delete("/api/wishlist/:id", async (req, res) => {
   }
 });
 
-// Get all categories
+// Category Routes
 app.get("/api/categories", async (req, res) => {
   try {
-    // Fetch distinct category values from products
     const categories = await Product.distinct("category");
     res.status(200).json({ data: { categories } });
   } catch (error) {
@@ -115,6 +114,21 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
+app.get("/api/categories/:categoryName", async (req, res) => {
+  try {
+    const categoryName = req.params.categoryName;
+    const products = await Product.find({ category: categoryName });
+
+    if (!products.length) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json({ data: { category: { name: categoryName, products } } });
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    res.status(500).json({ message: "Failed to fetch category", error });
+  }
+});
 
 // Start Server
 module.exports = app;
