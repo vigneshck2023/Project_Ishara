@@ -24,15 +24,40 @@ app.get("/", (req, res) => {
 });
 
 // Get all products
+// app.get("/api/products", async (req, res) => {
+//   try {
+//     const products = await Product.find();
+//     res.status(200).json({ data: { products } });
+//   } catch (error) {
+//     console.error("Error fetching products:", error);
+//     res.status(500).json({ message: "Failed to fetch products", error });
+//   }
+// });
+
+
+// Get all products OR search products
 app.get("/api/products", async (req, res) => {
   try {
-    const products = await Product.find();
+    const { search } = req.query; // search keyword from query
+
+    let products;
+    if (search && search.trim() !== "") {
+      // Search products by name (case-insensitive)
+      products = await Product.find({
+        name: { $regex: search, $options: "i" }
+      });
+    } else {
+      // No search term → return all products
+      products = await Product.find();
+    }
+
     res.status(200).json({ data: { products } });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Failed to fetch products", error });
   }
 });
+
 
 // Create new product
 app.post("/api/products", async (req, res) => {
@@ -139,3 +164,8 @@ app.get("/api/categories/:categoryName", async (req, res) => {
 
 // Start Server
 module.exports = app;
+
+const PORT = 3000;
+app.listen(PORT,() => {
+  console.log(`Running on port ${PORT}`);
+})
