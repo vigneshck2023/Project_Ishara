@@ -124,6 +124,73 @@ app.delete("/api/wishlist/:id", async (req, res) => {
   }
 });
 
+
+// Get wishlist for a user
+app.get("/api/wishlist/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const wishlist = await Wishlist.findOne({ user: userId }).populate("products");
+
+    if (!wishlist) {
+      return res.status(200).json({ data: [] });
+    }
+
+    res.status(200).json({ data: wishlist.products });
+  } catch (error) {
+    console.error("Error fetching wishlist:", error);
+    res.status(500).json({ error: "Failed to fetch wishlist" });
+  }
+});
+
+// Add product to wishlist
+app.post("/api/wishlist/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { productId } = req.body;
+
+    let wishlist = await Wishlist.findOne({ user: userId });
+
+    if (!wishlist) {
+      wishlist = new Wishlist({ user: userId, products: [] });
+    }
+
+    // prevent duplicates
+    if (!wishlist.products.includes(productId)) {
+      wishlist.products.push(productId);
+    }
+
+    await wishlist.save();
+    res.status(201).json({ message: "Item added to wishlist", data: wishlist });
+  } catch (error) {
+    console.error("Error adding to wishlist:", error);
+    res.status(500).json({ error: "Failed to add item to wishlist" });
+  }
+});
+
+// Remove product from wishlist
+app.delete("/api/wishlist/:userId/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+
+    const wishlist = await Wishlist.findOne({ user: userId });
+    if (!wishlist) {
+      return res.status(404).json({ error: "Wishlist not found" });
+    }
+
+    wishlist.products = wishlist.products.filter(
+      (id) => id.toString() !== productId
+    );
+
+    await wishlist.save();
+    res.status(200).json({ message: "Item removed from wishlist" });
+  } catch (error) {
+    console.error("Error removing wishlist item:", error);
+    res.status(500).json({ error: "Failed to remove item from wishlist" });
+  }
+});
+
+
+
 // Category Routes
 app.get("/api/categories", async (req, res) => {
   try {
