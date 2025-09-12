@@ -10,7 +10,7 @@ const { Product, Wishlist } = require("./models/ecommerce.models");
 app.use(express.json());
 app.use(cors({ origin: "*", optionsSuccessStatus: 200 }));
 
-// Initialize Database (Vercel-friendly)
+// Initialize Database
 initializeDatabase().catch(err => console.error("DB connection failed:", err.message || err));
 
 // Root Route
